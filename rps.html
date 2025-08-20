@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rock Paper Scissors</title>
+  <style>
+    /* ====== GLOBAL STYLES ====== */
+    body {
+      margin: 0;                           /* 1 */
+      padding: 0;                          /* 2 */
+      height: 100vh;                       /* 3 */
+      display: flex;                       /* 4 */
+      justify-content: center;             /* 5 */
+      align-items: center;                 /* 6 */
+      background: linear-gradient(135deg, #fc466b, #3f5efb); /* 7 */
+      font-family: "Poppins", sans-serif;  /* 8 */
+      color: #fff;                         /* 9 */
+      text-align: center;                  /* 10 */
+      overflow: hidden;                    /* 11 */
+    }
+
+    .container {
+      width: 400px;                        /* 12 */
+      padding: 30px;                       /* 13 */
+      border-radius: 25px;                 /* 14 */
+      background: rgba(255, 255, 255, 0.12); /* 15 */
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4); /* 16 */
+      backdrop-filter: blur(12px);         /* 17 */
+      border: 2px solid rgba(255,255,255,0.25); /* 18 */
+      transition: transform 0.3s ease;     /* 19 */
+      animation: fadeIn 1s ease;           /* 20 */
+    }
+
+    .container:hover {
+      transform: scale(1.02);              /* 21 */
+    }
+
+    h1 {
+      font-size: 30px;                     /* 22 */
+      margin-bottom: 15px;                 /* 23 */
+      text-shadow: 0 3px 8px rgba(0,0,0,0.5); /* 24 */
+      letter-spacing: 1px;                 /* 25 */
+    }
+
+    p {
+      margin-bottom: 20px;                 /* 26 */
+      font-size: 15px;                     /* 27 */
+      opacity: 0.85;                       /* 28 */
+    }
+
+    /* ====== BUTTONS ====== */
+    .buttons {
+      display: flex;                       /* 29 */
+      justify-content: space-around;       /* 30 */
+      margin: 20px 0;                      /* 31 */
+    }
+
+    .btn {
+      font-size: 40px;                     /* 32 */
+      padding: 18px;                       /* 33 */
+      border-radius: 20px;                 /* 34 */
+      border: none;                        /* 35 */
+      cursor: pointer;                     /* 36 */
+      transition: 0.3s;                    /* 37 */
+      background: rgba(255,255,255,0.2);   /* 38 */
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* 39 */
+    }
+
+    .btn:hover {
+      transform: scale(1.2) rotate(-5deg); /* 40 */
+      background: rgba(255,255,255,0.35);  /* 41 */
+    }
+
+    .btn:active {
+      transform: scale(0.9);               /* 42 */
+    }
+
+    /* ====== RESULT ====== */
+    #result {
+      min-height: 50px;                    /* 43 */
+      font-size: 18px;                     /* 44 */
+      font-weight: bold;                   /* 45 */
+      margin-top: 10px;                    /* 46 */
+      animation: pop 0.5s ease;            /* 47 */
+    }
+
+    .win { color: #00ff88; }               /* 48 */
+    .lose { color: #ff4d6d; }              /* 49 */
+    .draw { color: #ffd93d; }              /* 50 */
+
+    /* ====== SCORE ====== */
+    .score {
+      display: flex;                       /* 51 */
+      justify-content: space-between;      /* 52 */
+      margin-top: 15px;                    /* 53 */
+      font-size: 18px;                     /* 54 */
+      font-weight: bold;                   /* 55 */
+    }
+
+    .score span {
+      padding: 8px 15px;                   /* 56 */
+      border-radius: 12px;                 /* 57 */
+      background: rgba(255,255,255,0.1);   /* 58 */
+      transition: transform 0.2s;          /* 59 */
+    }
+
+    .score span.update {
+      transform: scale(1.3);               /* 60 */
+    }
+
+    /* ====== RESET BUTTON ====== */
+    .reset {
+      margin-top: 25px;                    /* 61 */
+      padding: 10px 25px;                  /* 62 */
+      border-radius: 15px;                 /* 63 */
+      border: none;                        /* 64 */
+      background: linear-gradient(135deg, #43e97b, #38f9d7); /* 65 */
+      color: #333;                         /* 66 */
+      font-weight: bold;                   /* 67 */
+      cursor: pointer;                     /* 68 */
+      transition: 0.3s;                    /* 69 */
+    }
+
+    .reset:hover {
+      transform: scale(1.05);              /* 70 */
+      box-shadow: 0 6px 15px rgba(0,0,0,0.3); /* 71 */
+    }
+
+    /* ====== ANIMATIONS ====== */
+    @keyframes pop {
+      0% {transform: scale(0.8); opacity: 0;} /* 72 */
+      100% {transform: scale(1); opacity: 1;} /* 73 */
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);} /* 74 */
+      to {opacity: 1; transform: translateY(0);}      /* 75 */
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🪨 📄 ✂️ Rock Paper Scissors</h1>
+    <p>Click a button to play against the CPU!</p>
+
+    <div class="buttons">
+      <button class="btn" onclick="play('rock')">🪨</button>
+      <button class="btn" onclick="play('paper')">📄</button>
+      <button class="btn" onclick="play('scissors')">✂️</button>
+    </div>
+
+    <div id="result"></div>
+    <div class="score">
+      <span>You: <span id="userScore">0</span></span>
+      <span>CPU: <span id="compScore">0</span></span>
+    </div>
+
+    <button class="reset" onclick="resetGame()">Reset</button>
+  </div>
+
+  <script>
+    let userScore = 0;
+    let compScore = 0;
+
+    function play(userChoice) {
+      const choices = ['rock', 'paper', 'scissors'];
+      const compChoice = choices[Math.floor(Math.random() * 3)];
+      let resultText = '';
+      let resultClass = '';
+
+      if (userChoice === compChoice) {
+        resultText = `🤝 It's a draw! Both chose ${userChoice}`;
+        resultClass = 'draw';
+      } else if (
+        (userChoice === 'rock' && compChoice === 'scissors') ||
+        (userChoice === 'paper' && compChoice === 'rock') ||
+        (userChoice === 'scissors' && compChoice === 'paper')
+      ) {
+        userScore++;
+        resultText = `🎉 You win! ${userChoice} beats ${compChoice}`;
+        resultClass = 'win';
+        animateScore('userScore');
+      } else {
+        compScore++;
+        resultText = `😢 You lose! ${compChoice} beats ${userChoice}`;
+        resultClass = 'lose';
+        animateScore('compScore');
+      }
+
+      const resultEl = document.getElementById('result');
+      resultEl.className = resultClass;
+      resultEl.innerText = resultText;
+      document.getElementById('userScore').innerText = userScore;
+      document.getElementById('compScore').innerText = compScore;
+    }
+
+    function animateScore(id) {
+      const el = document.getElementById(id).parentNode;
+      el.classList.add('update');
+      setTimeout(() => el.classList.remove('update'), 300);
+    }
+
+    function resetGame() {
+      userScore = 0;
+      compScore = 0;
+      document.getElementById('userScore').innerText = userScore;
+      document.getElementById('compScore').innerText = compScore;
+      document.getElementById('result').innerText = '';
+      document.getElementById('result').className = '';
+    }
+  </script>
+</body>
+</html>
