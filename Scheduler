@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Scheduler</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    input, button {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .events {
+      max-width: 500px;
+      margin: auto;
+    }
+    .event {
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .event strong {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <h1>📅 Daily Event Scheduler</h1>
+
+  <div class="form">
+    <input type="text" id="title" placeholder="Event Title">
+    <input type="date" id="date">
+    <input type="time" id="time">
+    <button onclick="addEvent()">Add Event</button>
+  </div>
+
+  <div class="form">
+    <input type="date" id="filterDate">
+    <button onclick="filterEvents()">Show Events</button>
+  </div>
+
+  <div class="events" id="events"></div>
+
+  <script>
+    // Closure for unique ID generator
+    const idGenerator = (function () {
+      let id = 0;
+      return function () {
+        return ++id;
+      };
+    })();
+
+    // Store events
+    let events = [];
+
+    // Add event
+    function addEvent() {
+      const title = document.getElementById("title").value.trim();
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+
+      // Validate input
+      if (!title || !date || !time) {
+        alert("⚠ Please fill all fields!");
+        return;
+      }
+
+      const eventDateTime = new Date(`${date}T${time}`);
+      if (isNaN(eventDateTime)) {
+        alert("⚠ Invalid date/time!");
+        return;
+      }
+
+      const event = {
+        id: idGenerator(),
+        title,
+        date,
+        time
+      };
+      events.push(event);
+
+      displayEvents(events);
+      setReminder(event);
+
+      // Reset input
+      document.getElementById("title").value = "";
+      document.getElementById("date").value = "";
+      document.getElementById("time").value = "";
+    }
+
+    // Display events
+    function displayEvents(eventList) {
+      const eventsDiv = document.getElementById("events");
+      eventsDiv.innerHTML = "";
+
+      if (eventList.length === 0) {
+        eventsDiv.innerHTML = "<p>No events found.</p>";
+        return;
+      }
+
+      eventList.forEach(e => {
+        const div = document.createElement("div");
+        div.classList.add("event");
+        div.innerHTML = `
+          <strong>${e.title}</strong><br>
+          Date: ${new Date(e.date).toDateString()} <br>
+          Time: ${e.time}
+        `;
+        eventsDiv.appendChild(div);
+      });
+    }
+
+    // Filter events by date
+    function filterEvents() {
+      const filterDate = document.getElementById("filterDate").value;
+      if (!filterDate) {
+        alert("⚠ Please select a date to filter.");
+        return;
+      }
+
+      const filtered = events.filter(e => e.date === filterDate);
+      displayEvents(filtered);
+    }
+
+    // Reminder using setTimeout
+    function setReminder(event) {
+      const now = new Date();
+      const eventTime = new Date(`${event.date}T${event.time}`);
+      const timeDiff = eventTime.getTime() - now.getTime();
+
+      if (timeDiff > 0) {
+        setTimeout(() => {
+          alert(`⏰ Reminder: "${event.title}" at ${event.time}`);
+        }, timeDiff);
+      }
+    }
+  </script>
+</body>
+</html>
