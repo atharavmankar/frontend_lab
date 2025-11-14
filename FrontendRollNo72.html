@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        background: #f5f6fa;
+    }
+
+    /* HEADER */
+    header {
+        background: #4b7bec;
+        padding: 20px 25px;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    header img {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        border: 3px solid white;
+    }
+
+    .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    /* BOX UI */
+    .box {
+        background: white;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .box input {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+    .box button {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: none;
+        background: #4b7bec;
+        color: white;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    /* CARDS */
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 15px;
+        margin-top: 10px;
+    }
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        transition: .2s;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    /* EVENTS */
+    #eventList li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        animation: fadeIn .3s;
+    }
+
+    #eventList button {
+        margin-left: 8px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        color: white;
+    }
+
+    .editBtn { background: #ffa502; }
+    .deleteBtn { background: #ff4757; }
+    .saveBtn { background: #2ed573; }
+    .cancelBtn { background: #57606f; }
+
+    /* ANIMATION */
+    @keyframes fadeIn {
+        from { opacity:0; transform: translateY(5px);}
+        to   { opacity:1; transform: translateY(0);}
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1 id="studentName">Student Name</h1>
+    <img id="profilePic" src="#" alt="">
+</header>
+
+<div class="container">
+
+    <!-- ALL INPUTS (INTERACTIVE) -->
+    <div class="box">
+        <h2>Student Details</h2>
+
+        <input id="nameInput" placeholder="Enter Name" oninput="liveUpdate()">
+        <input id="profileInput" placeholder="Enter Profile Image URL" oninput="liveUpdate()">
+
+        <input id="attendanceInput" placeholder="Attendance %" oninput="liveUpdate()">
+        <input id="cgpaInput" placeholder="CGPA" oninput="liveUpdate()">
+        <input id="creditsInput" placeholder="Credits" oninput="liveUpdate()">
+        <input id="examsInput" placeholder="No. of Exams" oninput="liveUpdate()">
+
+        <input id="chartDataInput" placeholder="Chart values e.g. 75,80,88,90" oninput="updateChart()">
+    </div>
+
+    <!-- DASHBOARD CARDS -->
+    <div class="cards">
+        <div class="card"><h3>Attendance</h3><p id="attendanceVal">--</p></div>
+        <div class="card"><h3>CGPA</h3><p id="cgpaVal">--</p></div>
+        <div class="card"><h3>Credits</h3><p id="creditsVal">--</p></div>
+        <div class="card"><h3>Exams</h3><p id="examsVal">--</p></div>
+    </div>
+
+    <br>
+
+    <!-- CHART -->
+    <h2>Attendance Trend</h2>
+    <canvas id="attendanceChart"></canvas>
+
+    <br>
+
+    <!-- EVENTS CRUD SYSTEM -->
+    <h2>Upcoming Events </h2>
+
+    <div class="box">
+        <input id="eventInput" placeholder="Enter event e.g. 🎉 Hackathon — Jan 5">
+        <button onclick="addEvent()">Add Event</button>
+    </div>
+
+    <ul id="eventList"></ul>
+
+</div>
+
+
+<script>
+/* ---------------- INTERACTIVE LIVE UPDATE ---------------- */
+function liveUpdate() {
+    document.getElementById("studentName").innerText =
+        nameInput.value.trim() || "Student Name";
+
+    if (profileInput.value.trim())
+        document.getElementById("profilePic").src = profileInput.value.trim();
+
+    attendanceVal.innerText = attendanceInput.value;
+    cgpaVal.innerText = cgpaInput.value;
+    creditsVal.innerText = creditsInput.value;
+    examsVal.innerText = examsInput.value;
+}
+
+/* -------------------- CHART INTERACTIVE -------------------- */
+let chart;
+
+function createChart(values) {
+    const ctx = document.getElementById("attendanceChart");
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: ["Jan","Feb","Mar","Apr","May","Jun"],
+            datasets: [{
+                label: "Attendance %",
+                data: values,
+                borderColor: "#3867d6",
+                backgroundColor: "rgba(72,126,241,0.2)",
+                borderWidth: 3,
+                tension: 0.4
+            }]
+        },
+        options: { responsive: true }
+    });
+}
+
+// default
+createChart([75, 80, 82, 85, 90, 92]);
+
+function updateChart() {
+    const raw = chartDataInput.value.trim();
+    if (!raw) return;
+
+    const values = raw.split(",").map(x => parseInt(x)).filter(n => !isNaN(n));
+
+    if (values.length > 0) {
+        createChart(values);
+    }
+}
+
+/* -------------------- EVENTS CRUD -------------------- */
+let events = [
+    "📢 AI Workshop — Nov 20",
+    "📚 Mid-Sem Exams — Dec 2",
+    "🏆 Sports Day — Dec 10",
+];
+
+function renderEvents() {
+    const list = document.getElementById("eventList");
+    list.innerHTML = "";
+
+    events.forEach((evt, i) => {
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+            <span class="eventText">${evt}</span>
+            <div>
+                <button class="editBtn" onclick="editEvent(${i})">Edit</button>
+                <button class="deleteBtn" onclick="deleteEvent(${i})">Delete</button>
+            </div>
+        `;
+
+        list.appendChild(li);
+    });
+}
+
+/* CREATE */
+function addEvent() {
+    const text = eventInput.value.trim();
+    if (!text) return;
+
+    events.push(text);
+    eventInput.value = "";
+    renderEvents();
+}
+
+/* DELETE */
+function deleteEvent(i) {
+    events.splice(i, 1);
+    renderEvents();
+}
+
+/* UPDATE */
+function editEvent(i) {
+    const list = document.getElementById("eventList");
+    const li = list.children[i];
+    const oldText = events[i];
+
+    li.innerHTML = `
+        <input type="text" id="editInput${i}" value="${oldText}" style="flex:1;padding:8px;margin-right:10px;">
+        <button class="saveBtn" onclick="saveEvent(${i})">Save</button>
+        <button class="cancelBtn" onclick="renderEvents()">Cancel</button>
+    `;
+}
+
+function saveEvent(i) {
+    const newText = document.getElementById("editInput" + i).value.trim();
+    if (newText) events[i] = newText;
+    renderEvents();
+}
+
+/* INITIAL LOAD */
+renderEvents();
+
+</script>
+</body>
+</html>
